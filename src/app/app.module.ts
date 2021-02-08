@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms'  
+import { ReactiveFormsModule} from '@angular/forms' 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -37,6 +39,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { LocalForageModule,LocalForageService } from 'ngx-localforage';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -46,8 +50,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
   imports: [
     BrowserModule,
     AppRoutingModule,
+    LocalForageModule.forRoot(),
+    HttpClientModule,
     BrowserAnimationsModule,
-    MatCheckboxModule,
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
+    FormsModule,
     MatCheckboxModule,
     MatButtonModule,
     MatInputModule,

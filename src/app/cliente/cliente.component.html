@@ -6,39 +6,141 @@
 		</p>
 	</section>
 
-	<section id="listagem" *ngIf="dataClientes.length > 0">
+	<section id="listagem" *ngIf="dataClientes.length > 0 && !action">
 		<h1 align="center">Clientes cadastrados</h1>
-	<table mat-table [dataSource]="dataClientes" class="mat-elevation-z8">
+		<table mat-table [dataSource]="dataClientes" class="mat-elevation-z8">
 
-  	<!-- ID -->
-  	<ng-container matColumnDef="id">
-  		<th mat-header-cell *matHeaderCellDef> ID </th>
-  		<td mat-cell *matCellDef="let element"> {{element.id}} </td>
-  	</ng-container>
+			<!-- ID -->
+			<ng-container matColumnDef="id">
+				<th mat-header-cell *matHeaderCellDef> ID </th>
+				<td mat-cell *matCellDef="let element"> {{element.id}} </td>
+			</ng-container>
 
-  	<!-- Nome -->
-  	<ng-container matColumnDef="name">
-  		<th mat-header-cell *matHeaderCellDef> Nome </th>
-  		<td mat-cell *matCellDef="let element"> {{element.name}} </td>
-  	</ng-container>
+			<!-- Nome -->
+			<ng-container matColumnDef="name">
+				<th mat-header-cell *matHeaderCellDef> Nome </th>
+				<td mat-cell *matCellDef="let element"> {{element.name}} </td>
+			</ng-container>
 
-  	<!-- Telefone -->
-  	<ng-container matColumnDef="tel">
-  		<th mat-header-cell *matHeaderCellDef> Telefone </th>
-  		<td mat-cell *matCellDef="let element"> {{element.tel}} </td>
-  	</ng-container>
+			<!-- Telefone -->
+			<ng-container matColumnDef="tel">
+				<th mat-header-cell *matHeaderCellDef> Telefone </th>
+				<td mat-cell *matCellDef="let element"> {{element.tel}} </td>
+			</ng-container>
 
-  	<!-- Documento -->
-  	<ng-container matColumnDef="document">
-  		<th mat-header-cell *matHeaderCellDef> Documento </th>
-  		<td mat-cell *matCellDef="let element"> {{element.document}} </td>
-  	</ng-container>
+			<!-- Documento -->
+			<ng-container matColumnDef="cpf">
+				<th mat-header-cell *matHeaderCellDef> Documento </th>
+				<td mat-cell *matCellDef="let element"> {{element.cpf}} </td>
+			</ng-container>
+			
+			<!-- Opções -->
+			<ng-container matColumnDef="options">
+				<th mat-header-cell *matHeaderCellDef> Opções </th>
+				<td mat-cell *matCellDef="let element">
+					<button mat-icon-button aria-label="Delete" color="primary">
+						<mat-icon>search</mat-icon>
+					</button>
+					<button mat-icon-button aria-label="Novo" color="primary">
+						<mat-icon color="#ba000d">create</mat-icon>
+					</button>
+					<button mat-icon-button aria-label="Delete" color="primary">
+						<mat-icon color="#ba000d">delete</mat-icon>
+					</button>
+				</td>
+			</ng-container>
 
-  	<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  	<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-  </table>
-</section>
+			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+		</table>
+	</section>
 
-<section id="cadastro" *ngIf="action == 'novo'">
-	<h1 align="center">Cadastrar Cliente</h1>
-</section>
+	<section id="cadastro" *ngIf="action == 'novo'" max-width="800px">
+		<h1 align="center">Cadastrar Cliente</h1>
+		<mat-horizontal-stepper [linear]="true" #stepper>
+			<mat-step [stepControl]="firstFormGroup">
+				<form [formGroup]="firstFormGroup">
+					<ng-template matStepLabel>Dados pessoais</ng-template>
+					<input type="hidden" formControlName="id">
+					<mat-form-field class="full-width">
+						<mat-label>Nome</mat-label>
+						<input matInput placeholder="Seu nome" formControlName="name" required>
+					</mat-form-field>
+					<mat-form-field class="width-50">
+						<mat-label>Telefone</mat-label>
+						<input matInput placeholder="Telefone" formControlName="tel" required>
+					</mat-form-field>
+					<mat-form-field class="width-50">
+						<mat-label>CPF</mat-label>
+						<input matInput placeholder="CPF" formControlName="cpf" required>
+					</mat-form-field>
+					<div align="center">
+						<button mat-raised-button color="primary" matStepperNext>Próximo</button>
+					</div>
+				</form>
+			</mat-step>
+			<mat-step [stepControl]="secondFormGroup" label="Endereço">
+				<form [formGroup]="secondFormGroup">
+					<mat-form-field appearance="fill" required class="width-50">
+						<mat-label>Estado</mat-label>
+						<mat-select (selectionChange)="getCidades($event)" formControlName="uf">
+							<mat-option *ngFor="let estado of estados" [value]="estado.sigla">
+								{{estado.nome}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field appearance="fill" required class="width-50">
+						<mat-label>Cidade</mat-label>
+						<mat-select [disabled]="!cidades" formControlName="cidade">
+							<mat-option *ngFor="let cidade of cidades" [value]="cidade.nome">
+								{{cidade.nome}}
+							</mat-option>
+						</mat-select>
+					</mat-form-field>
+					<mat-form-field class="full-width">
+						<mat-label>Logradouro</mat-label>
+						<input matInput formControlName="logradouro" placeholder="Ex. Rua A, 158, Centro"
+						required>
+					</mat-form-field>
+					<div align="center">
+						<button class="mr-1" mat-raised-button color="primary" matStepperPrevious>Anterior</button>
+						<button mat-raised-button color="primary" matStepperNext>Próximo</button>
+					</div>
+				</form>
+			</mat-step>
+			<mat-step>
+				<ng-template matStepLabel>Concluir</ng-template>
+				<h3 align="center">Você terminou o cadastro. Confira os dados:</h3>
+				<table>
+					<tr>
+						<td width="200">Nome</td>
+						<td>{{firstFormGroup.value.name}}</td>
+					</tr>
+					<tr>
+						<td>Telefone</td>
+						<td>{{firstFormGroup.value.tel}}</td>
+					</tr>
+					<tr>
+						<td>CPF</td>
+						<td>{{firstFormGroup.value.cpf}}</td>
+					</tr>
+					<tr>
+						<td>Estado</td>
+						<td>{{secondFormGroup.value.uf}}</td>
+					</tr>
+					<tr>
+						<td>Cidade</td>
+						<td>{{secondFormGroup.value.cidade}}</td>
+					</tr>
+					<tr>
+						<td>Logradouro</td>
+						<td>{{secondFormGroup.value.logradouro}}</td>
+					</tr>
+				</table>
+				<div class="text-center">
+					<button class="mr-2" mat-raised-button color="secondary" matStepperPrevious>Voltar</button>
+					<button mat-raised-button color="primary" (click)="saveCliente()">Enviar dados</button>
+				</div>
+			</mat-step>
+		</mat-horizontal-stepper>
+	</section>

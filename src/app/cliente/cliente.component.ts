@@ -1,29 +1,92 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { LocalForageService } from 'ngx-localforage';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-cliente',
   templateUrl: './cliente.component.html',
   styleUrls: ['./cliente.component.scss']
 })
-export class ClienteComponent{
+export class ClienteComponent implements OnInit {
 	title = 'Cliente'
   dataClientes = [];
+  estados: [];
+  cidades: [];
+  clientes: string[] = [];
   id: number;
   action: string;
   cliente: any;
-  displayedColumns: string[] = ['id', 'name', 'tel', 'document'];
+  numClientes: any;
+  displayedColumns: string[] = ['id', 'name', 'tel', 'cpf', 'options'];
+  firstFormGroup: FormGroup;
+  secondFormGroup: FormGroup;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(private router: Router, private route: ActivatedRoute, private _formBuilder: FormBuilder,  private localforage: LocalForageService, private http: HttpClient) { }
 
-  ngOnInit(): void {
+  ngOnInit(){
     this.cliente = this.route.params.subscribe(params => {
       this.id = +params['id'];
       this.action = params['action'];
     });
+    this.firstFormGroup = this._formBuilder.group({
+      id: '',
+      name: ['', Validators.required],
+      tel: ['', Validators.required],
+      cpf: ['', Validators.required]
+    });
+    this.secondFormGroup = this._formBuilder.group({
+      logradouro: ['', Validators.required],
+      cidade: ['', Validators.required],
+      uf: ['', Validators.required]
+    });
+    this.localforage.keys().subscribe(keys => {
+      this.numClientes = keys.length;
+      for (var i = keys.length - 1; i >= 0; i--) {
+        this.getCliente(keys[i]);
+      }
+      this.dataClientes = this.clientes;
+    });
+    this.getEstados();
+
+  }
+  getEstados(){
+    return this.http.get<any>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+    .subscribe(data => {
+      this.estados = data.sort((a,b) => (a.sigla > b.sigla) ? 1 : -1);
+    }),
+    err => {
+      console.log(err);
+    }
+  }
+  getCidades(e){
+    return this.http.get<any>('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + e.value + '/municipios')
+    .subscribe(data => {
+      this.cidades = data.sort((a,b) => (a.nome > b.nome) ? 1 : -1);
+    }),
+    err => {
+      console.log(err);
+    }
+  }
+  getCliente(id){    
+    this.localforage.getItem(id).subscribe(res => {
+      this.clientes.push(res);
+    });
+  }
+  saveCliente(){
+    let id = this.numClientes + 1;
+    let form1 = this.firstFormGroup.value;
+    form1.id = id;
+    let form2 = this.secondFormGroup.value;
+    let dados = {...form1, ...form2};
+    this.localforage.setItem(id, dados).subscribe(res => {
+      this.getCliente(id);
+      this.router.navigate(['/cliente']);
+    });
   }
   imports:{
-  	
+    HttpClient
   }
 
 }
