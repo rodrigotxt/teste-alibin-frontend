@@ -55,31 +55,66 @@
 		</table>
 	</section>
 
-	<section id="ver-cliente" *ngIf="action == 'ver'">
-		<table>
+	<section id="ver-cliente" *ngIf="action == 'ver' && clienteActive !== 'undefined'">
+		<h1 align="center">Detalhes do Cliente</h1>
+		<table *ngIf="clienteActive">
 			<tr>
 				<td width="200">Nome</td>
-				<td>{{firstFormGroup.value.name}}</td>
+				<td>{{clienteActive.name}}</td>
 			</tr>
 			<tr>
 				<td>Telefone</td>
-				<td>{{firstFormGroup.value.tel}}</td>
+				<td>{{clienteActive.tel}}</td>
 			</tr>
 			<tr>
 				<td>CPF</td>
-				<td>{{firstFormGroup.value.cpf}}</td>
+				<td>{{clienteActive.cpf}}</td>
 			</tr>
 			<tr>
 				<td>Estado</td>
-				<td>{{secondFormGroup.value.uf}}</td>
+				<td>{{clienteActive.uf}}</td>
 			</tr>
 			<tr>
 				<td>Cidade</td>
-				<td>{{secondFormGroup.value.cidade}}</td>
+				<td>{{clienteActive.cidade}}</td>
 			</tr>
 			<tr>
 				<td>Logradouro</td>
-				<td>{{secondFormGroup.value.logradouro}}</td>
+				<td>{{clienteActive.logradouro}}</td>
+			</tr>
+		</table>
+		<div class="text-center">
+			<h2 align="center">Produtos</h2>
+			<mat-form-field appearance="fill" class="mx-auto">
+				<mat-label>Adicionar Produto</mat-label>
+				<mat-select [(value)]="produtoSelect">
+					<mat-option *ngFor="let produto of produtos" [value]="produto">
+						{{produto.name + ' / ' + produto.preco}}
+					</mat-option>
+				</mat-select>
+			</mat-form-field>
+
+			<button mat-flat-button aria-label="Adicionar produto" color="accent" (click)="addProduto(produtoSelect)">
+				<mat-icon>check</mat-icon> Adicionar
+			</button>
+		</div>
+		
+		<table class="text-center" *ngIf="clienteActive && clienteActive.itens.length">
+			<thead>				
+				<th>Cód.</th>
+				<th>Nome</th>
+				<th>Preço</th>
+				<th></th>
+			</thead>
+			<tr *ngFor="let item of clienteActive.itens; index as i;">
+				<td>{{item.cod}}</td>
+				<td>{{item.name}}</td>
+				<td>{{item.preco}}</td>
+				<td width="30">
+					<button mat-icon-button aria-label="Delete" color="primary" (click)="deleteProduto(i)">
+						<mat-icon color="#ba000d">delete</mat-icon>
+					</button>
+				</td>
 			</tr>
 		</table>
 	</section>

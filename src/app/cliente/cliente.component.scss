@@ -45,3 +45,22 @@ table{
 	box-shadow:none;
 	border:none;
 }
+#ver-cliente{
+table{
+	border-collapse: collapse;
+	margin:1em auto;
+	max-width: 600px;
+	td, th{
+  border: 1px solid #ddd;
+  padding: 8px;
+	}
+	tr{
+		&:nth-child(even){
+			background-color: #f2f2f2;
+		}
+		&:hover{
+			background-color: #ddd;
+		}
+	}
+}
+}

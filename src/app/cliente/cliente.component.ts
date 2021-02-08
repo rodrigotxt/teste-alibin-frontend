@@ -13,13 +13,15 @@ import { HttpClient } from '@angular/common/http';
 export class ClienteComponent implements OnInit {
 	title = 'Cliente'
   dataClientes: any[] = [];
+  produtos: any[] = [];
+  produtoSelect: string;
   estados: [];
   cidades: [];
   clientes: string[] = [];
-  id: number;
+  id: any;
   action: string;
   cliente: any;
-  clienteActive: {};
+  clienteActive: any;
   numClientes: any;
   displayedColumns: string[] = ['id', 'name', 'tel', 'cpf', 'options'];
   firstFormGroup: FormGroup;
@@ -31,6 +33,9 @@ export class ClienteComponent implements OnInit {
     this.cliente = this.route.params.subscribe(params => {
       this.id = +params['id'];
       this.action = params['action'];
+      if(this.action == 'ver'){
+        this.clienteActive = this.getCliente(this.id, true);
+      }
     });
     this.firstFormGroup = this._formBuilder.group({
       id: '',
@@ -45,7 +50,28 @@ export class ClienteComponent implements OnInit {
     });
     this.reloadClientes();
     this.getEstados();
-
+    this.getProdutos();
+  }
+  getProdutos(){
+    let cods = [3896,3353,5882,3984,16692,17876,18563,11317,3108,12618,13787,16411];
+    let letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    let produtos = [];
+    for (var i = cods.length - 1; i >= 0; i--) {
+      let productName = 'Produto ' + letters[Math.floor(Math.random() * letters.length)] + letters[Math.floor(Math.random() * letters.length)];
+      let produto = {};
+      produto['cod'] = cods[i];
+      produto['name'] = productName;
+      produto['preco'] =  'R$ ' + Math.floor(Math.random() * 100 + 10) + ',00'; // numero aletorio
+      this.produtos.push(produto);
+    }
+    // return this.produtos;
+  }
+  addProduto(produto){
+    // return console.log(this.clienteActive);
+    this.clienteActive['itens'].push(produto);
+  }
+  deleteProduto(index){
+   this.clienteActive['itens'].splice(index, 1); 
   }
   getEstados(){
     return this.http.get<any>('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
@@ -75,15 +101,15 @@ export class ClienteComponent implements OnInit {
       }
     });
   }
-  getCliente(id){    
+  getCliente(id, active = false){    
     this.localforage.getItem(id).subscribe(res => {
       this.clientes.push(res);
       this.dataClientes.push(res);
       this.dataClientes = [...this.dataClientes];
+      if(active) this.clienteActive = res;
     });
   }
   verCliente(cliente){
-    this.clienteActive = cliente;
     this.router.navigate(['/cliente/ver/' + cliente.id]);
   }
   deleteCliente(id){
@@ -97,6 +123,7 @@ export class ClienteComponent implements OnInit {
     let id = this.numClientes + 1;
     let form1 = this.firstFormGroup.value;
     form1.id = id;
+    form1.itens = [];
     let form2 = this.secondFormGroup.value;
     let dados = {...form1, ...form2};
     this.localforage.setItem(id, dados).subscribe(res => {
