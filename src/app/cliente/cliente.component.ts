@@ -33,7 +33,7 @@ export class ClienteComponent implements OnInit {
     this.cliente = this.route.params.subscribe(params => {
       this.id = +params['id'];
       this.action = params['action'];
-      if(this.action == 'ver'){
+      if(this.action == 'ver' || this.action == 'editar'){
         this.clienteActive = this.getCliente(this.id, true);
       }
     });
@@ -67,8 +67,9 @@ export class ClienteComponent implements OnInit {
     // return this.produtos;
   }
   addProduto(produto){
-    // return console.log(this.clienteActive);
-    this.clienteActive['itens'].push(produto);
+    let cliente = this.clienteActive;
+    cliente['itens'].push(produto);
+    this.localforage.setItem(cliente.id, cliente);
   }
   deleteProduto(index){
    this.clienteActive['itens'].splice(index, 1); 
@@ -86,6 +87,9 @@ export class ClienteComponent implements OnInit {
     return this.http.get<any>('https://servicodados.ibge.gov.br/api/v1/localidades/estados/' + e.value + '/municipios')
     .subscribe(data => {
       this.cidades = data.sort((a,b) => (a.nome > b.nome) ? 1 : -1);
+      if(this.clienteActive){
+
+      }
     }),
     err => {
       console.log(err);
@@ -101,12 +105,18 @@ export class ClienteComponent implements OnInit {
       }
     });
   }
+  editarCliente(id){
+    this.router.navigate(['/cliente/editar/' + id]);
+  }
   getCliente(id, active = false){    
     this.localforage.getItem(id).subscribe(res => {
       this.clientes.push(res);
       this.dataClientes.push(res);
       this.dataClientes = [...this.dataClientes];
-      if(active) this.clienteActive = res;
+      if(active){
+        this.clienteActive = res;
+        this.getCidades({value: res.uf});
+      };
     });
   }
   verCliente(cliente){
@@ -119,16 +129,22 @@ export class ClienteComponent implements OnInit {
     });
   }
 
-  saveCliente(){
+  saveCliente(update = false){
     let id = this.numClientes + 1;
+    let dados = {};
+    if(update){
+      id = this.clienteActive.id;
+      dados = this.clienteActive;
+    }else{
     let form1 = this.firstFormGroup.value;
     form1.id = id;
     form1.itens = [];
     let form2 = this.secondFormGroup.value;
-    let dados = {...form1, ...form2};
+    dados = {...form1, ...form2};      
+    }
     this.localforage.setItem(id, dados).subscribe(res => {
       this.getCliente(id);
-      this.router.navigate(['/cliente']);
+      this.router.navigate(['/cliente/ver/' + id]);
     });
   }
   imports:{
