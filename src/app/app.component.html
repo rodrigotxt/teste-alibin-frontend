@@ -1,17 +1,19 @@
-<p>
+<mat-sidenav-container id="navigation">
   <mat-toolbar color="primary">
     <button mat-icon-button mat-button [matMenuTriggerFor]="menuCliente" aria-label="icon-button">
       <mat-icon>menu</mat-icon>
     </button>
-<mat-menu #menuCliente="matMenu">
-  <button mat-menu-item [routerLink]="['/cliente/novo']">Adicionar novo</button>
-  <button mat-menu-item [routerLink]="['/cliente']">Lista de Clientes</button>
-</mat-menu>
+    <mat-menu #menuCliente="matMenu">
+      <button mat-menu-item [routerLink]="['/cliente/novo']">Adicionar novo</button>
+      <button mat-menu-item [routerLink]="['/cliente']">Lista de Clientes</button>
+    </mat-menu>
     <span>Clientes App</span>
     <span class="example-spacer"></span>
     <button mat-icon-button class="example-icon supervisor_account-icon" aria-label="icon-button">
       <mat-icon>supervisor_account</mat-icon>
     </button>
   </mat-toolbar>
-</p>
-<router-outlet></router-outlet>
+</mat-sidenav-container>
+<mat-sidenav-container id="mainContainer">
+  <router-outlet></router-outlet>
+</mat-sidenav-container>
