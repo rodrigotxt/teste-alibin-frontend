@@ -9,15 +9,17 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './cliente.component.html',
   styleUrls: ['./cliente.component.scss']
 })
+
 export class ClienteComponent implements OnInit {
 	title = 'Cliente'
-  dataClientes = [];
+  dataClientes: any[] = [];
   estados: [];
   cidades: [];
   clientes: string[] = [];
   id: number;
   action: string;
   cliente: any;
+  clienteActive: {};
   numClientes: any;
   displayedColumns: string[] = ['id', 'name', 'tel', 'cpf', 'options'];
   firstFormGroup: FormGroup;
@@ -41,13 +43,7 @@ export class ClienteComponent implements OnInit {
       cidade: ['', Validators.required],
       uf: ['', Validators.required]
     });
-    this.localforage.keys().subscribe(keys => {
-      this.numClientes = keys.length;
-      for (var i = keys.length - 1; i >= 0; i--) {
-        this.getCliente(keys[i]);
-      }
-      this.dataClientes = this.clientes;
-    });
+    this.reloadClientes();
     this.getEstados();
 
   }
@@ -69,11 +65,34 @@ export class ClienteComponent implements OnInit {
       console.log(err);
     }
   }
+  reloadClientes(clear = false){
+    this.clientes = [];
+    this.localforage.keys().subscribe(keys => {
+      this.numClientes = keys.length;
+      for (var i = keys.length - 1; i >= 0; i--) {
+        this.getCliente(keys[i]);
+        // this.dataClientes = this.clientes;
+      }
+    });
+  }
   getCliente(id){    
     this.localforage.getItem(id).subscribe(res => {
       this.clientes.push(res);
+      this.dataClientes.push(res);
+      this.dataClientes = [...this.dataClientes];
     });
   }
+  verCliente(cliente){
+    this.clienteActive = cliente;
+    this.router.navigate(['/cliente/ver/' + cliente.id]);
+  }
+  deleteCliente(id){
+    console.log('remove', id);
+    this.localforage.removeItem(id).subscribe(res => {
+      this.reloadClientes(true);
+    });
+  }
+
   saveCliente(){
     let id = this.numClientes + 1;
     let form1 = this.firstFormGroup.value;

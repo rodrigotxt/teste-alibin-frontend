@@ -38,13 +38,13 @@
 			<ng-container matColumnDef="options">
 				<th mat-header-cell *matHeaderCellDef> Opções </th>
 				<td mat-cell *matCellDef="let element">
-					<button mat-icon-button aria-label="Delete" color="primary">
+					<button mat-icon-button aria-label="Verqaz detalhes" color="primary" (click)="verCliente(element)">
 						<mat-icon>search</mat-icon>
 					</button>
 					<button mat-icon-button aria-label="Novo" color="primary">
 						<mat-icon color="#ba000d">create</mat-icon>
 					</button>
-					<button mat-icon-button aria-label="Delete" color="primary">
+					<button mat-icon-button aria-label="Delete" color="primary" (click)="deleteCliente(element.id)">
 						<mat-icon color="#ba000d">delete</mat-icon>
 					</button>
 				</td>
@@ -52,6 +52,35 @@
 
 			<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+		</table>
+	</section>
+
+	<section id="ver-cliente" *ngIf="action == 'ver'">
+		<table>
+			<tr>
+				<td width="200">Nome</td>
+				<td>{{firstFormGroup.value.name}}</td>
+			</tr>
+			<tr>
+				<td>Telefone</td>
+				<td>{{firstFormGroup.value.tel}}</td>
+			</tr>
+			<tr>
+				<td>CPF</td>
+				<td>{{firstFormGroup.value.cpf}}</td>
+			</tr>
+			<tr>
+				<td>Estado</td>
+				<td>{{secondFormGroup.value.uf}}</td>
+			</tr>
+			<tr>
+				<td>Cidade</td>
+				<td>{{secondFormGroup.value.cidade}}</td>
+			</tr>
+			<tr>
+				<td>Logradouro</td>
+				<td>{{secondFormGroup.value.logradouro}}</td>
+			</tr>
 		</table>
 	</section>
 
